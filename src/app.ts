@@ -1,5 +1,6 @@
 import express from 'express'; 
 import morgan from 'morgan';
+import UserRouter from './controller/user';
 
 export class App {
     public app: express.Application; 
@@ -8,15 +9,15 @@ export class App {
     constructor(){
     this.app = express(); 
      this.middlewares(); 
-    // this.routes(); 
+     this.routes(); 
     }
     private middlewares() {
         this.app.use(morgan('dev'));
         this.app.use(express.json());
     }
-   /* private routes (){
+    private routes (){
         this.app.use('/user', UserRouter);
-    }*/
+    }
     async listen(): Promise<void> {
         await this.app.listen(this.port, () => {
             console.log ('Servidor Conectado')
