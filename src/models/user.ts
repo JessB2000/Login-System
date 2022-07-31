@@ -15,7 +15,7 @@ const UserSchema = new mongoose.Schema({
     senha: {
      type: String, 
      required: true, 
-     select: false, 
+     select: true, 
     },
     createdAt: {
      type: Date, 
@@ -29,6 +29,7 @@ UserSchema.pre("save", async function (next) {
   console.log(hash); 
   this.senha = hash; 
 })
+
 export const UserModel = mongoose.model("User", UserSchema);
 
  

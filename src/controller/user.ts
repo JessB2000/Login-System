@@ -9,5 +9,7 @@ UserRouter.route('/register')
 UserRouter.route('/login')
      .post(loginUser);
    
+UserRouter.route('/:id')
+   //  .get(checkToken);
 
 export default UserRouter;
