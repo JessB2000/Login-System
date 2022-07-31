@@ -1,15 +1,13 @@
 import { Router } from "express";
-import {createUser, deleteUser, } from "../service/user"
+import {createUser, loginUser, } from "../service/user"
 
 const UserRouter = Router(); 
 
 UserRouter.route('/register')
-   // .get(getUsers)
     .post(createUser);
 
-UserRouter.route('/:id')
-   // .get(getUser)
-    .delete(deleteUser)
-   // .put(updateUser);
+UserRouter.route('/login')
+     .post(loginUser);
+   
 
 export default UserRouter;

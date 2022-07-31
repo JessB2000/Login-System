@@ -22,6 +22,7 @@ const UserSchema = new mongoose.Schema({
      default: Date.now
     }
 })
+
 UserSchema.pre("save", async function (next) {
   const hash = await bcryptjs.hash(this.senha, 10);
   console.log(this); 
