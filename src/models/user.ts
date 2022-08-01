@@ -1,6 +1,5 @@
 import mongoose from "../database/db";
 import bcryptjs from "bcryptjs";
-import { isConstructorDeclaration } from "typescript";
 const UserSchema = new mongoose.Schema({
     nome: {
       type: String, 
@@ -15,7 +14,7 @@ const UserSchema = new mongoose.Schema({
     senha: {
      type: String, 
      required: true, 
-     select: true, 
+     select: false, 
     },
     createdAt: {
      type: Date, 

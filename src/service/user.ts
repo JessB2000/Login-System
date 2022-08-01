@@ -2,8 +2,11 @@ import dotenv from "dotenv";
 dotenv.config(); 
 import {Request, Response} from 'express'; 
 import {UserModel} from '../models/user';
-import bcryptjs, { hash } from "bcryptjs"; 
+import bcryptjs from "bcryptjs";
+import bcrypt from "bcrypt"; 
+import jwt from "jsonwebtoken"; 
 
+const secret = process.env.SECRET; 
 
 // register
 export async function createUser(req:Request, res: Response){
@@ -28,7 +31,7 @@ export async function createUser(req:Request, res: Response){
     await User.save(); 
     return res.json({
      error: false, 
-     message: "Usuário registrado com sucesso",
+     msg: "Usuário registrado com sucesso",
      data: User
     }); 
 } catch(error){
@@ -42,31 +45,47 @@ export async function loginUser(req:Request, res: Response){
 
     const {email, senha} = req.body; 
 
-    if (!email) {
+    /*if (!email) {
         return res.status(422).json({ msg: "O email é obrigatório!" });
       }
-    if (!senha){
+   /* if (!senha){
         return res.status(422).json({ msg: "A senha é obrigatória!" });
+    }*/
+    const user = await UserModel.findOne({email}).select("+senha"); 
+
+    if(!user){
+        return res.status(404).json({ 
+            error: true, 
+            msg: "Usuário não encontrado!" });
     }
-    const User = await UserModel.findOne({email: email}); 
-
-    console.log(User); 
-    console.log(senha); 
-    console.log(User?.senha); 
-
-    if(!User){
-        return res.status(404).json({ msg: "Usuário não encontrado!" });
+   const checarSenha =  await bcrypt.compare(senha, user.senha);
+   
+    if(!checarSenha){
+        return res.status(404).send({
+            error: true,
+            msg: "Senha inválida"
+           
+        }) 
     }
-    const checkSenha = await bcryptjs.compare(senha, User.senha); // não funciona
+    return res.json(user); 
 
-    if (!checkSenha) {
-        return res.status(422).json({ msg: "Senha inválida" });
-     }
-     
-     return res.json({
-        msg:"Usuário encontrado com sucesso"
-     })
+    //autenticação 
 
+    /*try{
+      const token = jwt.sign({
+        id:user._id,
+      }, secret, {
+        expiresIn:86400
+      } ); 
+      return res.json({
+        user,
+        token,
+        msg: "Autenticação realizada com sucesso!"
+      })
+    }
+    catch(error){
+        res.status(500).json({ msg: error });
+    }*/
 }
 
 
