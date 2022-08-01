@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema({
     senha: {
      type: String, 
      required: true, 
-     select: false, 
+     select: true, 
     },
     createdAt: {
      type: Date, 
@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema({
 })
 
 UserSchema.pre("save", async function (next) {
-  const hash = await bcryptjs.hash(this.senha, 10);
+  const hash = await bcryptjs.hash(this.senha, 12);
   console.log(this); 
   console.log(hash); 
   this.senha = hash; 

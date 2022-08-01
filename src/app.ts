@@ -1,6 +1,9 @@
 import express from 'express'; 
 import morgan from 'morgan';
+import AdminRouter from './controller/admin';
 import UserRouter from './controller/user';
+import { autenticacaoMiddleware } from './middlewares/autenticacao';
+
 
 export class App {
     public app: express.Application; 
@@ -17,6 +20,7 @@ export class App {
     }
     private routes (){
         this.app.use('/user', UserRouter);
+        this.app.use('/admin',autenticacaoMiddleware, AdminRouter); 
     }
     async listen(): Promise<void> {
         await this.app.listen(this.port, () => {

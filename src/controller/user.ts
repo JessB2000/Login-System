@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {createUser, loginUser, } from "../service/user"
+import {createUser, loginUser } from "../service/user"
 
 const UserRouter = Router(); 
 
@@ -9,7 +9,6 @@ UserRouter.route('/register')
 UserRouter.route('/login')
      .post(loginUser);
    
-UserRouter.route('/:id')
-   //  .get(checkToken);
-
+UserRouter.route('/delete')
+   //  .delete(deleteUser); 
 export default UserRouter;

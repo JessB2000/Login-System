@@ -1,12 +1,23 @@
 import dotenv from "dotenv"; 
 dotenv.config(); 
+import express from "express";
 import {Request, Response} from 'express'; 
 import {UserModel} from '../models/user';
-import bcryptjs from "bcryptjs";
-import bcrypt from "bcrypt"; 
+import bcrypt from "bcryptjs"; 
 import jwt from "jsonwebtoken"; 
 
 const secret = process.env.SECRET; 
+// gerar token
+
+const gerarToken = (user = {}) => {
+    return jwt.sign({
+        id: user.id,
+        nome: user.nome
+     },secret,{
+        expiresIn:86400
+     })
+}
+
 
 // register
 export async function createUser(req:Request, res: Response){
@@ -17,76 +28,52 @@ export async function createUser(req:Request, res: Response){
             message: "Usuário já existe"
         })
     }
-    const User = await UserModel.create(req.body); // criando novo registro do banco de dados
-    if(!User.nome){
+    const user = await UserModel.create(req.body); // criando novo registro do banco de dados
+   if(!user.nome){
         return res.status(422).json({ msg: "O nome é obrigatório!" });
     }
-    if (!User.email){
+    if (!user.email){
         return res.status(422).json({ msg: "O email é obrigatório!" });
     }
-    if(!User.senha){
+    if(!user.senha){
         return res.status(422).json({ msg: "A senha é obrigatória!" });
     }
-    try {
-    await User.save(); 
+
     return res.json({
      error: false, 
      msg: "Usuário registrado com sucesso",
-     data: User
+     data: user,
+     token: gerarToken(user)
     }); 
-} catch(error){
-    res.status(500).json({message:error}); 
-}
 }
 
 //Login 
 
 export async function loginUser(req:Request, res: Response){
+ const {email, senha} = req.body; 
+ if(!email){
+    return res.status(422).json({ message: "O email é obrigatório!" });
+ }
+ if(!senha){
+    return res.status(422).json({ message: "A senha é obrigatória!" });
+ }
+ const user = await UserModel.findOne({email});
 
-    const {email, senha} = req.body; 
+ if(!user){
+    return res.status(400).json({
+        error: true, 
+        message: "Usuário inválido"
+    })
+ } 
+ if(!await bcrypt.compare(senha, user.senha)){
+    return res.status(400).send({
+        error: true,
+        message: "Senha inválida"
+    })
+ }
 
-    /*if (!email) {
-        return res.status(422).json({ msg: "O email é obrigatório!" });
-      }
-   /* if (!senha){
-        return res.status(422).json({ msg: "A senha é obrigatória!" });
-    }*/
-    const user = await UserModel.findOne({email}).select("+senha"); 
-
-    if(!user){
-        return res.status(404).json({ 
-            error: true, 
-            msg: "Usuário não encontrado!" });
-    }
-   const checarSenha =  await bcrypt.compare(senha, user.senha);
-   
-    if(!checarSenha){
-        return res.status(404).send({
-            error: true,
-            msg: "Senha inválida"
-           
-        }) 
-    }
-    return res.json(user); 
-
-    //autenticação 
-
-    /*try{
-      const token = jwt.sign({
-        id:user._id,
-      }, secret, {
-        expiresIn:86400
-      } ); 
-      return res.json({
-        user,
-        token,
-        msg: "Autenticação realizada com sucesso!"
-      })
-    }
-    catch(error){
-        res.status(500).json({ msg: error });
-    }*/
+ return res.json({
+    user,
+    token: gerarToken(user)
+ })
 }
-
-
-
