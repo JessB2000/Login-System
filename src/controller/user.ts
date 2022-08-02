@@ -1,5 +1,7 @@
 import { Router } from "express";
-import {createUser, loginUser } from "../service/user"
+import { autenticacaoMiddleware } from "../middlewares/autenticacao";
+import {createUser, deleteUser, loginUser, updateUser } from "../service/user"
+
 
 const UserRouter = Router(); 
 
@@ -9,6 +11,9 @@ UserRouter.route('/register')
 UserRouter.route('/login')
      .post(loginUser);
    
-UserRouter.route('/delete')
-   //  .delete(deleteUser); 
+UserRouter.route('/delete/:nome')
+      .delete(autenticacaoMiddleware, deleteUser); 
+
+UserRouter.route('/update/:nome')
+      .patch(autenticacaoMiddleware, updateUser); 
 export default UserRouter;

@@ -1,10 +1,11 @@
 import dotenv from "dotenv"; 
 dotenv.config(); 
-import express from "express";
+import express, { request, response } from "express";
 import {Request, Response} from 'express'; 
 import {UserModel} from '../models/user';
 import bcrypt from "bcryptjs"; 
 import jwt from "jsonwebtoken"; 
+import {autenticacaoMiddleware} from '../middlewares/autenticacao';
 
 const secret = process.env.SECRET; 
 // gerar token
@@ -76,4 +77,29 @@ export async function loginUser(req:Request, res: Response){
     user,
     token: gerarToken(user)
  })
+}
+
+export async function deleteUser(req:Request, res: Response){
+    const nome = req.body;
+   await UserModel.findOneAndDelete(nome);
+      if (!nome) return res.status(500).json({ msg: "nome não encontrado"});
+      return res.json({
+        error: false, 
+        message: "Usuário excluído com sucesso"
+      });
+  };
+  
+export async function updateUser(req:Request, res:Response){
+    console.log(req.body.nome);
+ await UserModel.findOneAndUpdate({ nome: req.body.nome },{ $set: { senha: req.body.senha}}) 
+ try{
+
+    return res.json({
+        error:false,
+        message: "Senha atualizada com sucesso"
+    })
+
+ }catch(error){
+    console.log(error); 
+ }
 }

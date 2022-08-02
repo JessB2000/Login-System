@@ -5,7 +5,7 @@ import jwt, { decode } from "jsonwebtoken";
 
 const secret = process.env.SECRET; 
 
-export const autenticacaoMiddleware= (req: Request, res: Response, next) =>{
+export const autenticacaoMiddleware = (req: Request, res: Response, next) =>{
  const autentheader = req.headers.authorization; 
  if(!autentheader){
     return res.status(401).json({
